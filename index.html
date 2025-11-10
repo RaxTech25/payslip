@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Delhi Public School Ludhiana – Pay Slip</title>
+  <style>
+    :root { --muted:#4b5563; }
+    *{box-sizing:border-box}
+    body{margin:0;background:#fff}
+
+    .actions{max-width:210mm;margin:14px auto 0;display:flex;gap:8px;justify-content:flex-end;align-items:center}
+    .btn{appearance:none;border:1px solid #111;border-radius:6px;padding:8px 12px;font-weight:700;background:#111;color:#fff;cursor:pointer}
+    .btn.light{background:#fff;color:#111}
+    .hint{font-size:12px;color:var(--muted);margin-right:auto}
+
+    .sheet{width:210mm;min-height:297mm;margin:10px auto;padding:10mm 12mm;border:1px solid #e5e7eb;background:#fff;font-family:"Times New Roman", Times, serif;color:#000;}
+
+    /* Header with left logo and centered text */
+    .header{display:flex;align-items:center;gap:16px;padding-bottom:6px;border-bottom:2px solid #000}
+    .crest{flex-shrink:0;width:90px;height:100px;object-fit:contain;margin-left:6px;}
+    .header-text{text-align:center;flex:1;}
+    .title{font-size:20px;font-weight:700;margin:6px 0 2px}
+    .address{font-size:12px;line-height:1.2;margin:0}
+    .period{font-size:14px;font-weight:700;margin:8px 0}
+
+    /* Info key-value grid */
+    .kv{display:grid;grid-template-columns:1fr 1fr;column-gap:36px;row-gap:6px;margin:10px 0 6px}
+    .kv .row{display:grid;grid-template-columns:140px 6px 1fr;align-items:baseline;font-size:13px}
+    .kv .row .label{white-space:nowrap;font-weight:700} /* make label bold */
+    .kv .row .sep{text-align:center}
+
+    /* Earnings/Deductions table */
+    table.payslip{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
+    table.payslip th,table.payslip td{border:1px solid #000;padding:6px 8px}
+    table.payslip thead th{background:#f8f8f8;font-weight:700}
+    table.payslip .num{text-align:right}
+    table.payslip tfoot td{font-weight:700}
+
+    /* Net pay */
+    .net{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:baseline;margin:10px 0 4px}
+    .net .label{font-weight:700}
+    .words{margin:0 0 10px;font-size:13px}
+
+    /* Footer */
+    .footer{display:grid;grid-template-columns:1fr 1fr;align-items:end;margin-top:10px}
+    .footer .date{font-size:13px}
+    .footer .sign{text-align:right;font-size:13px}
+
+    /* Print settings */
+    @page{ size: A4; margin: 0; }
+    @media print{ 
+      .actions,.hint,#status{display:none !important} /* hide banners and controls entirely */
+      .sheet{border:none;margin:0;width:auto;min-height:auto;padding:0}
+    }
+
+    /* Edit visuals are OFF by default (for a real look). Toggle with Edit button. */
+    [contenteditable]{outline:none}
+    .editing [contenteditable]:focus{outline:1px dashed #9ca3af;background:#fafafa}
+
+    #status{max-width:210mm;margin:8px auto 0;padding:8px 12px;border:1px solid #fee2e2;background:#fef2f2;color:#b91c1c;border-radius:8px;display:none}
+    #status.ok{border-color:#d1fae5;background:#ecfdf5;color:#065f46}
+  </style>
+</head>
+<body>
+  <div id="status"></div>
+  <div class="actions">
+    <span class="hint">Use <strong>Edit</strong> to change fields. Disable "Headers & footers" in print dialog.</span>
+    <button id="toggleEdit" class="btn light" aria-pressed="false">Edit</button>
+    <input id="logoUpload" type="file" accept="image/*" class="btn light" title="Upload logo (embeds as data URL)"/>
+    <button class="btn light" onclick="window.print()">Print</button>
+    <button id="downloadPdf" class="btn">Download PDF (A4)</button>
+  </div>
+
+  <section id="slip" class="sheet">
+    <div class="header">
+      <img id="crest" class="crest" src="https://dps-ludhiana-edunext-cf.edunexttechnologies.com/1603779333707_dps_school_logo.png" alt="Logo" crossorigin="anonymous"/>
+      <div class="header-text">
+        <h1 class="title" data-edit>Delhi Public School Ludhiana</h1>
+        <p class="address" data-edit>Vill. Jhammat, P.O. Ayali Kalan, Ludhiana 142 027<br>Phone : +91 70870 19118, 70870 20118</p>
+        <div class="period" data-edit>Pay Slip for the Month of January - 2019</div>
+      </div>
+    </div>
+
+    <div class="kv">
+      <div class="row"><div class="label" data-edit>Name</div><div class="sep">:</div><div class="val" data-edit>Shivika Dogra</div></div>
+      <div class="row"><div class="label" data-edit>Working Days</div><div class="sep">:</div><div class="val" data-edit>26.00</div></div>
+      <div class="row"><div class="label" data-edit>Employee Code</div><div class="sep">:</div><div class="val" data-edit>41160</div></div>
+      <div class="row"><div class="label" data-edit>Present Days</div><div class="sep">:</div><div class="val" data-edit>26.00</div></div>
+      <div class="row"><div class="label" data-edit>Designation</div><div class="sep">:</div><div class="val" data-edit>PRT</div></div>
+      <div class="row"><div class="label" data-edit>Department</div><div class="sep">:</div><div class="val" data-edit>TEACHERS</div></div>
+    </div>
+
+    <table class="payslip" aria-label="Earnings and Deductions">
+      <thead>
+        <tr>
+          <th data-edit style="width:45%">Earning Details</th>
+          <th data-edit style="width:10%">Amt(Rs.)</th>
+          <th data-edit style="width:35%">Deduction Details</th>
+          <th data-edit style="width:10%">Amt(Rs.)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-edit>Basic Salary</td><td class="num" data-edit>36500.00</td>
+          <td data-edit>PF</td><td class="num" data-edit>4774.00</td>
+        </tr>
+        <tr>
+          <td data-edit>GRADE PAY</td><td class="num" data-edit>0.00</td>
+          <td data-edit>TDS</td><td class="num" data-edit>2000.00</td>
+        </tr>
+        <tr><td data-edit>DA</td><td class="num" data-edit>0.00</td><td data-edit></td><td class="num" data-edit></td></tr>
+        <tr><td data-edit>Dearness Allowance 7TH</td><td class="num" data-edit>3285.00</td><td data-edit></td><td class="num" data-edit></td></tr>
+        <tr><td data-edit>HRA</td><td class="num" data-edit>0.00</td><td data-edit></td><td class="num" data-edit></td></tr>
+        <tr><td data-edit>SPECIAL ALLOWANCE</td><td class="num" data-edit>0.00</td><td data-edit></td><td class="num" data-edit></td></tr>
+        <tr><td data-edit>ARREAR</td><td class="num" data-edit>0.00</td><td data-edit></td><td class="num" data-edit></td></tr>
+        <tr><td data-edit>HRA @16</td><td class="num" data-edit>5840.00</td><td data-edit></td><td class="num" data-edit></td></tr>
+        <tr><td data-edit>HRA @20</td><td class="num" data-edit>0.00</td><td data-edit></td><td class="num" data-edit></td></tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="num" data-edit>Total</td><td class="num" data-edit>45625.00</td>
+          <td class="num" data-edit>Total</td><td class="num" data-edit>6774.00</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="net"><div class="label" data-edit>Net Pay</div><div class="val" data-edit>: 38851.00</div></div>
+    <p class="words" data-edit>(Thirty Eight Thousand Eight Hundred and Fifty One Rupees Only)</p>
+
+    <div class="footer">
+      <div class="date" data-edit>Date : February 02, 2019</div>
+      <div class="sign" data-edit>Signature</div>
+    </div>
+
+    <div style="text-align:center;margin-top:10px;font-size:13px">System generated salary slip.</div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    const slip=document.getElementById('slip');
+    const crest=document.getElementById('crest');
+    const statusEl=document.getElementById('status');
+    const toggleBtn=document.getElementById('toggleEdit');
+
+    function showStatus(msg,ok=false){statusEl.textContent=msg;statusEl.style.display='block';statusEl.className=ok?'ok':'';}
+
+    // Hide banners on print entirely
+    window.addEventListener('beforeprint',()=>{ statusEl.style.display='none'; });
+
+    // Toggle edit mode: enable contenteditable on all [data-edit]
+    function setEditable(on){
+      document.body.classList.toggle('editing',on);
+      toggleBtn.setAttribute('aria-pressed',on);
+      toggleBtn.textContent=on?'Done':'Edit';
+      slip.querySelectorAll('[data-edit]').forEach(el=>el.setAttribute('contenteditable', on ? 'true':'false'));
+    }
+    // start in view mode (non-editable look)
+    setEditable(false);
+    toggleBtn.addEventListener('click',()=> setEditable(toggleBtn.getAttribute('aria-pressed')!=='true'));
+
+    // Embed logo to avoid CORS
+    document.getElementById('logoUpload')?.addEventListener('change',e=>{
+      const f=e.target.files?.[0]; if(!f) return; const r=new FileReader();
+      r.onload=()=>{ crest.src=r.result; showStatus('Logo embedded for export.', true); };
+      r.readAsDataURL(f);
+    });
+
+    // PDF export
+    async function exportPDF(){
+      const {jsPDF}=window.jspdf; if(!window.html2canvas || !jsPDF){ return alert('Exporter libraries failed to load'); }
+      const wasEditing=document.body.classList.contains('editing');
+      setEditable(false); // ensure clean look
+      const canvas=await html2canvas(slip,{scale:2,useCORS:true,backgroundColor:'#fff'});
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      const pageW=210,pageH=297,margin=10; const imgW=pageW-margin*2; const imgH=(canvas.height*imgW)/canvas.width;
+      if(imgH<=pageH-margin*2){ pdf.addImage(canvas.toDataURL('image/png'),'PNG',margin,margin,imgW,imgH,'','FAST'); }
+      else { const pxPageH=Math.floor(((pageH-margin*2)*canvas.width)/imgW); let sY=0; while(sY<canvas.height){ const sCanvas=document.createElement('canvas'); sCanvas.width=canvas.width; sCanvas.height=Math.min(pxPageH,canvas.height-sY); sCanvas.getContext('2d').drawImage(canvas,0,sY,canvas.width,sCanvas.height,0,0,sCanvas.width,sCanvas.height); pdf.addImage(sCanvas.toDataURL('image/png'),'PNG',margin,margin,imgW,(sCanvas.height*imgW)/canvas.width,'','FAST'); sY+=sCanvas.height; if(sY<canvas.height) pdf.addPage(); } }
+      pdf.save('Pay_Slip_A4.pdf');
+      if(wasEditing) setEditable(true);
+    }
+    document.getElementById('downloadPdf')?.addEventListener('click', exportPDF);
+  </script>
+</body>
+</html>
